@@ -122,6 +122,69 @@ print("unique scores: ", unique_scores)
 
 
 
+#dictionary 
+print("dictionary -----")
+
+#dictionaries stores key-value pairs aand are very useful for structured data
+#dixtionaries stoes data with keys
+
+
+student ={
+    "name": "muuko",
+    "age" : 20,
+    "scores" : [77, 92, 78],
+    "departmant" : "LAW",
+    "is_active":True,
+    "hobbies":["dancing", "singing"]
+}
+
+print("student Dictionaries")
+print(student)
+
+#accesing values
+print("\nStudent name:", student['name'])
+print("Student scores:", student['scores'])
+print("Average Scores:", sum(student['scores'])/len(student['scores']))
+print("Student name:", student['name'])
+print("hobbies", student["hobbies"])
+# list comprehension
+print("miku passing Scores >80:", [s for s in student['scores'] if s > 80])
+
+
+
+
+
+College ={
+    "name": "Ss collage",
+    "Address" : 20,
+    "Faculty" : ["BCA", "BBS", "BA"],
+    "is_open":True
+}
+print("\n College name:", College['name'])
+print("college Address:", College['Address'])
+print("faculty:", College['Faculty'])
+
+
+# function
+def get_grade(score):
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score >= 70:
+        return "C"
+    elif score >= 60:
+        return "D"
+    else:
+        return "F"
+
+# calling the function
+print(get_grade(95))   # A
+print(get_grade(85))   # B
+print(get_grade(72))   # C
+print(get_grade(61))   # D
+print(get_grade(45))   # F
+
 
 
 
