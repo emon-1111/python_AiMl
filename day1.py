@@ -37,7 +37,7 @@ print("name:",others)
 #list operations
 
 student_name= ["anamika","emon","cmon","lmon"]
-student_score=[12,13,14]
+student_score=[85, 92, 91,70]
 
 
 print(student_name)
@@ -54,19 +54,71 @@ student_name.append('demon')
 print("\n after adding demon", student_name)
 
 
-#add to end
-student_name.insert[1,"mmon"]  #insert in index 1
+#add to position
+student_name.insert(1,"mmon") #insert in index 1
 print("\n after adding demon", student_name)
 
-#add to end
-student_name.remove["demon"]  #removes last element
+#add to remove
+student_name.remove("demon")  #removes last element
 print("\n after adding demon", student_name)
 
 
-#list comprehension 
-#multiple command 
 
-# passing_scores = [scores   (if scvore>80)]
+#  List comprehension (1 line)
+passing = [score for score in student_score if score > 80]
+
+print(passing)  # [85, 92, 91]
+
+
+#Tuples are similar to list but cannot be changed after creation
+
+student_record =("meeka ", 20, 85, "cs")
+print("student Record tuples", student_record)
+
+
+#accesing tuples element
+
+print ("name: ", student_record[0])
+print ("Age: ", student_record[1])
+
+#tuples unpacking
+name,age ,score, department = student_record
+print("\n Unpacked:", name , "is", age ,"years old, scored", "in", department)
+
+
+#sets 
+#set are the unordered collection of unique  items 
+#sets automatically removes duplication
+
+course_A= {"HILO", "PILO", "MEELIO", 'CHEELO'}
+course_B={'billo',"khillo", "nillo","killo"}
+
+print ("course a ", course_A)
+print("course b: " ,course_B)
+
+
+#set operations
+# 1. Union all elements from both sets
+print("\nUnion:", course_A | course_B)
+
+# 2. Intersection common elements only
+print("Intersection:", course_A & course_B)
+
+# 3. Difference in A but not in B
+print("Difference A-B:", course_A - course_B)
+
+# 4. Symmetric Difference in either but not both
+print("Symmetric Difference:", course_A ^ course_B)
+
+# 5. Check if element exists
+print("HILO in course_A:", "HILO" in course_A)
+
+
+#remove duplicates from list using set
+score_with_duplicates =[85,58,85,90,90,70]
+unique_scores = list(set(score_with_duplicates)) #typecasting 
+print("\nOriginal scores: ",score_with_duplicates )
+print("unique scores: ", unique_scores)
 
 
 
