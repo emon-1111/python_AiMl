@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Score Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #080808; --surface: #111111; --surface2: #1a1a1a;
+      --border: #2a2a2a; --border-hi: #3f3f3f;
+      --text: #f0f0f0; --muted: #666666; --result-bg: #141414;
+    }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding: 60px 20px 80px;
+      position: relative; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none; z-index: 0;
+    }
+    .top-label { font-size: 0.68rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 18px; position: relative; z-index: 1; }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.02em; text-align: center; line-height: 1.1; margin-bottom: 10px; position: relative; z-index: 1; }
+    h1 span { color: var(--muted); font-weight: 600; }
+    .subtitle { font-size: 0.78rem; color: var(--muted); text-align: center; margin-bottom: 52px; position: relative; z-index: 1; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px 44px; width: 100%; max-width: 560px; position: relative; z-index: 1; }
+    .card-label { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 28px; display: flex; align-items: center; gap: 10px; }
+    .card-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    label { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    input, select { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 0.9rem; padding: 12px 14px; width: 100%; outline: none; transition: border-color 0.2s, background 0.2s; -webkit-appearance: none; }
+    input::placeholder { color: var(--muted); }
+    input:focus, select:focus { border-color: var(--border-hi); background: #1e1e1e; }
+    select option { background: #1a1a1a; }
+    .divider { height: 1px; background: var(--border); margin: 28px 0; }
+    .btn-predict { width: 100%; padding: 15px; background: var(--text); color: #080808; border: none; border-radius: 8px; font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, transform 0.15s; }
+    .btn-predict:hover { background: #d4d4d4; transform: translateY(-1px); }
+
+    /* result */
+    .result-box { margin-top: 24px; background: var(--result-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; border-left: 4px solid; }
+    .result-top { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .result-score { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+    .result-grade { font-size: 0.75rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .result-bar-wrap { margin-top: 16px; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .result-bar { height: 100%; border-radius: 99px; }
+    .result-message { margin-top: 14px; font-size: 0.78rem; color: var(--text); }
+    .result-tip { margin-top: 8px; font-size: 0.72rem; color: var(--muted); }
+
+    .error-box { margin-top: 14px; font-size: 0.72rem; color: #ff6b6b; }
+
+    footer { margin-top: 48px; font-size: 0.65rem; color: #333; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; position: relative; z-index: 1; }
+
+    @media (max-width: 500px) { .card { padding: 28px 22px; } .form-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <p class="top-label">ML Model · Linear Regression</p>
+  <h1>Student Score<br/><span>Predictor</span></h1>
+  <p class="subtitle">Enter student data below to generate a predicted final score.</p>
+
+  <div class="card">
+    <p class="card-label">Input Parameters</p>
+
+    <form action="/predict" method="POST">
+      <div class="form-grid">
+        <div class="field">
+          <label for="hours_studied">Hours Studied / day</label>
+          <input type="number" id="hours_studied" name="hours_studied" placeholder="e.g. 5" min="0" max="24" step="0.5" required />
+        </div>
+        <div class="field">
+          <label for="attendance">Attendance %</label>
+          <input type="number" id="attendance" name="attendance" placeholder="e.g. 85" min="0" max="100" step="1" required />
+        </div>
+        <div class="field">
+          <label for="sleep_hours">Sleep Hours / night</label>
+          <input type="number" id="sleep_hours" name="sleep_hours" placeholder="e.g. 7" min="0" max="24" step="0.5" required />
+        </div>
+        <div class="field">
+          <label for="previous_score">Previous Score</label>
+          <input type="number" id="previous_score" name="previous_score" placeholder="e.g. 72" min="0" max="100" step="0.1" required />
+        </div>
+        <div class="field">
+          <label for="parent_education">Parent Education</label>
+          <select id="parent_education" name="parent_education_encoded" required>
+            <option value="" disabled selected>Select level</option>
+            <option value="0">No formal education</option>
+            <option value="1">High School</option>
+            <option value="2">Bachelor's Degree</option>
+            <option value="3">Master's Degree</option>
+            <option value="4">PhD</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="extracurricular">Extracurricular</label>
+          <select id="extracurricular" name="extracurricular_encoded" required>
+            <option value="" disabled selected>Select</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <button type="submit" class="btn-predict">Predict Score</button>
+    </form>
+
+    {% if error %}
+  <p class="error-box">❌ {{ error }}</p>
+{% endif %}
+
+{% if prediction is not none %}
+<div class="result-box" style="border-left-color: {{ color }};">
+  <p class="result-top">Predicted Final Score</p>
+  <p class="result-score" style="color: {{ color }};">{{ emoji }} {{ prediction }}</p>
+  <p class="result-grade">Grade: {{ grade }}</p>
+  <div class="result-bar-wrap">
+    <div class="result-bar" style="width: {{ [prediction, 100] | min }}%; background: {{ color }};"></div>
+  </div>
+  <p class="result-message">{{ message }}</p>
+  <p class="result-tip">{{ tip }}</p>
+</div>
+{% endif %}
+
+  </div>
+
+  <footer>Built with Flask + Scikit-learn &nbsp;·&nbsp; Day 5</footer>
+
+</body>
+</html>
